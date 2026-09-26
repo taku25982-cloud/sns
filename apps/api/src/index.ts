@@ -3,6 +3,7 @@ import { bodyLimit } from 'hono/body-limit';
 import { createAuth } from './auth';
 import { completeOnboarding, getMyProfile, isRegistrationEnabled, updatePrivacy, usernameAvailable } from './onboarding';
 import { follow, pendingFollowRequests, resolveFollowRequest, setBlock, setMute, unfollow } from './social';
+import { reportDetail, reportQueue, reviewReport, submitReport } from './safety';
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -117,6 +118,46 @@ app.delete('/v1/users/:id/mute', async (context) => {
   const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
   if (!session) return context.json({ error: 'unauthorized' }, 401);
   const result = await setMute(context.env, session.user.id, context.req.param('id'), false);
+  return context.json(result.body, result.status);
+});
+
+app.post('/v1/reports', bodyLimit({ maxSize: 4 * 1024 }), async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  let input: unknown;
+  try {
+    input = await context.req.json();
+  } catch {
+    return context.json({ error: 'invalid_json' }, 400);
+  }
+  const result = await submitReport(context.env, session.user.id, input);
+  return context.json(result.body, result.status);
+});
+
+app.get('/v1/admin/reports', async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  const result = await reportQueue(context.env, session.user.id);
+  return context.json(result.body, result.status);
+});
+
+app.get('/v1/admin/reports/:id', async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  const result = await reportDetail(context.env, session.user.id, context.req.param('id'));
+  return context.json(result.body, result.status);
+});
+
+app.post('/v1/admin/reports/:id/review', bodyLimit({ maxSize: 4 * 1024 }), async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  let input: unknown;
+  try {
+    input = await context.req.json();
+  } catch {
+    return context.json({ error: 'invalid_json' }, 400);
+  }
+  const result = await reviewReport(context.env, session.user.id, context.req.param('id'), input);
   return context.json(result.body, result.status);
 });
 

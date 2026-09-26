@@ -117,6 +117,50 @@ export const mutes = sqliteTable('mutes', {
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
 }, (table) => [primaryKey({ columns: [table.muterId, table.mutedId] })]);
 
+export const adminUsers = sqliteTable('admin_users', {
+  userId: text('user_id').primaryKey().references(() => authUser.id, { onDelete: 'cascade' }),
+  role: text('role').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+});
+
+export const reports = sqliteTable('reports', {
+  id: text('id').primaryKey(),
+  reporterId: text('reporter_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  targetType: text('target_type').notNull(),
+  targetId: text('target_id').notNull(),
+  reason: text('reason').notNull(),
+  details: text('details'),
+  priority: text('priority').notNull(),
+  status: text('status').notNull().default('open'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  resolvedAt: integer('resolved_at', { mode: 'timestamp_ms' }),
+}, (table) => [
+  index('reports_queue_idx').on(table.status, table.priority, table.createdAt),
+  index('reports_reporter_idx').on(table.reporterId, table.createdAt),
+  index('reports_target_idx').on(table.targetType, table.targetId),
+]);
+
+export const moderationActions = sqliteTable('moderation_actions', {
+  id: text('id').primaryKey(),
+  targetUserId: text('target_user_id').references(() => users.id, { onDelete: 'set null' }),
+  actionType: text('action_type').notNull(),
+  reason: text('reason').notNull(),
+  moderatorId: text('moderator_id').notNull().references(() => adminUsers.userId),
+  startsAt: integer('starts_at', { mode: 'timestamp_ms' }).notNull(),
+  endsAt: integer('ends_at', { mode: 'timestamp_ms' }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, (table) => [index('moderation_actions_target_idx').on(table.targetUserId, table.createdAt)]);
+
+export const moderationAuditLog = sqliteTable('moderation_audit_log', {
+  id: text('id').primaryKey(),
+  actorAdminId: text('actor_admin_id').notNull().references(() => adminUsers.userId),
+  action: text('action').notNull(),
+  targetType: text('target_type').notNull(),
+  targetId: text('target_id').notNull(),
+  metadata: text('metadata').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, (table) => [index('moderation_audit_actor_idx').on(table.actorAdminId, table.createdAt)]);
+
 export const featureFlags = sqliteTable('feature_flags', {
   key: text('key').primaryKey(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),

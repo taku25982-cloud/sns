@@ -88,8 +88,12 @@ export async function getMyProfile(env: Env, authUserId: string) {
     username: profiles.username, displayName: profiles.displayName,
     isPrivate: profiles.isPrivate,
   }).from(users).innerJoin(profiles, eq(users.id, profiles.userId))
-    .where(and(eq(users.id, authUserId), eq(users.status, 'active'))).limit(1);
+    .where(eq(users.id, authUserId)).limit(1);
   if (!rows.length) return { id: authUserId, onboardingComplete: false };
+
+  if (rows[0].status !== 'active') {
+    return { id: authUserId, onboardingComplete: true, status: rows[0].status };
+  }
 
   const events = await db.select({ eventCode: userEvents.eventCode }).from(userEvents)
     .where(eq(userEvents.userId, authUserId));
