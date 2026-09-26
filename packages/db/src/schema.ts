@@ -82,6 +82,41 @@ export const userEvents = sqliteTable('user_events', {
   priority: integer('priority').notNull().default(0),
 }, (table) => [primaryKey({ columns: [table.userId, table.eventCode] })]);
 
+export const follows = sqliteTable('follows', {
+  followerId: text('follower_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  followeeId: text('followee_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.followerId, table.followeeId] }),
+  index('follows_followee_idx').on(table.followeeId, table.createdAt),
+]);
+
+export const followRequests = sqliteTable('follow_requests', {
+  requesterId: text('requester_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  targetId: text('target_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  status: text('status').notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  resolvedAt: integer('resolved_at', { mode: 'timestamp_ms' }),
+}, (table) => [
+  primaryKey({ columns: [table.requesterId, table.targetId] }),
+  index('follow_requests_target_idx').on(table.targetId, table.status, table.createdAt),
+]);
+
+export const blocks = sqliteTable('blocks', {
+  blockerId: text('blocker_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  blockedId: text('blocked_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, (table) => [
+  primaryKey({ columns: [table.blockerId, table.blockedId] }),
+  index('blocks_blocked_idx').on(table.blockedId),
+]);
+
+export const mutes = sqliteTable('mutes', {
+  muterId: text('muter_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  mutedId: text('muted_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+}, (table) => [primaryKey({ columns: [table.muterId, table.mutedId] })]);
+
 export const featureFlags = sqliteTable('feature_flags', {
   key: text('key').primaryKey(),
   enabled: integer('enabled', { mode: 'boolean' }).notNull().default(false),
