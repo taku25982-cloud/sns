@@ -4,7 +4,7 @@
 
 ## 現在の状態
 
-フェーズ1の初期実装中です。APIには認証基盤、年齢・同意を伴う登録完了、本人プロフィール取得、非公開設定を追加しました。登録は初期状態で無効です。Apple / Googleの認証情報、投稿、フィード、管理画面、参照画像に合わせたUIは未実装です。外部公開は行っていません。
+フェーズ1の実装中です。認証・年齢制限・フォロー・通報のAPI基盤と、ログイン・初期設定・ホーム空状態のExpo画面があります。画面は開発プレビューで、認証とAPIへの接続、投稿表示、参照画像との最終比較は未完了です。登録は初期状態で無効で、外部公開は行っていません。
 
 ## ローカル起動
 
@@ -18,7 +18,7 @@ npm run db:migrate -w @track-social/db
 npm run dev:api
 ```
 
-別のターミナルで `npm run dev:mobile` を実行します。API確認先は `http://127.0.0.1:8787/v1/health` です。ローカルWorkerには `apps/api/.dev.vars.development` に `TURSO_DATABASE_URL`、`TURSO_AUTH_TOKEN`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` を設定します。DB migrationは接続先を設定しない場合 `packages/db/local.db` に適用されます。秘密情報とローカルDBはGit管理されません。
+別のターミナルで `npm run dev:mobile` を実行します。ブラウザで画面を見る場合は `npm run web -w @track-social/mobile` を使用します。API確認先は `http://127.0.0.1:8787/v1/health` です。ローカルWorkerには `apps/api/.dev.vars.development` に `TURSO_DATABASE_URL`、`TURSO_AUTH_TOKEN`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` を設定します。DB migrationは接続先を設定しない場合 `packages/db/local.db` に適用されます。秘密情報とローカルDBはGit管理されません。
 
 ## 外部サービス
 

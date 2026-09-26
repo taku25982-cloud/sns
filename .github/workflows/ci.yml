@@ -17,4 +17,5 @@ jobs:
       - run: npm run types -w @track-social/api
       - run: npm run typecheck
       - run: npm run test -w @track-social/api
+      - run: npm exec --workspace @track-social/mobile -- expo export --platform web
       - run: npm exec --workspace @track-social/api -- wrangler deploy --env staging --dry-run
