@@ -11,13 +11,16 @@
   },
   "env": {
     "development": {
-      "vars": { "APP_ENV": "development" }
+      "vars": { "APP_ENV": "development" },
+      "secrets": { "required": ["TURSO_DATABASE_URL", "TURSO_AUTH_TOKEN", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL"] }
     },
     "staging": {
-      "vars": { "APP_ENV": "staging" }
+      "vars": { "APP_ENV": "staging" },
+      "secrets": { "required": ["TURSO_DATABASE_URL", "TURSO_AUTH_TOKEN", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL"] }
     },
     "production": {
-      "vars": { "APP_ENV": "production" }
+      "vars": { "APP_ENV": "production" },
+      "secrets": { "required": ["TURSO_DATABASE_URL", "TURSO_AUTH_TOKEN", "BETTER_AUTH_SECRET", "BETTER_AUTH_URL"] }
     }
   }
 }

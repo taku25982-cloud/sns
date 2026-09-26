@@ -3,6 +3,7 @@ node_modules/
 .wrangler/
 .env
 .env.*
+.dev.vars*
 !.env.example
 !.env.*.example
 *.local

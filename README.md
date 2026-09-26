@@ -4,7 +4,7 @@
 
 ## 現在の状態
 
-フェーズ0の土台です。Expoアプリの画面は開発用表示、Workers APIは `/v1/health` のみです。認証、投稿、フィード、管理画面はまだ実装していません。外部公開は行っていません。
+フェーズ1の初期実装中です。APIには認証基盤、年齢・同意を伴う登録完了、本人プロフィール取得、非公開設定を追加しました。登録は初期状態で無効です。Apple / Googleの認証情報、投稿、フィード、管理画面、参照画像に合わせたUIは未実装です。外部公開は行っていません。
 
 ## ローカル起動
 
@@ -18,8 +18,8 @@ npm run db:migrate -w @track-social/db
 npm run dev:api
 ```
 
-別のターミナルで `npm run dev:mobile` を実行します。API確認先は `http://127.0.0.1:8787/v1/health` です。DB migrationは `packages/db/local.db` に適用され、このファイルはGit管理されません。
+別のターミナルで `npm run dev:mobile` を実行します。API確認先は `http://127.0.0.1:8787/v1/health` です。ローカルWorkerには `apps/api/.dev.vars.development` に `TURSO_DATABASE_URL`、`TURSO_AUTH_TOKEN`、`BETTER_AUTH_SECRET`、`BETTER_AUTH_URL` を設定します。DB migrationは接続先を設定しない場合 `packages/db/local.db` に適用されます。秘密情報とローカルDBはGit管理されません。
 
 ## 外部サービス
 
-現時点ではCloudflareやTursoの本番環境に接続していません。`apps/api/wrangler.jsonc` のdevelopment / staging / productionは構成だけを分けた状態です。接続情報と秘密情報はリポジトリへ保存しません。
+開発用Turso DBを接続済みです。staging / productionのDBと認証情報は未設定です。Apple / Google OAuthの設定後に実機ログインを確認します。接続情報と秘密情報はリポジトリへ保存しません。

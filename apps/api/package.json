@@ -6,12 +6,20 @@
   "scripts": {
     "dev": "wrangler dev --env development",
     "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test src/age.test.ts",
     "types": "wrangler types --env development",
     "deploy:staging": "wrangler deploy --env staging",
     "deploy:production": "wrangler deploy --env production"
   },
   "dependencies": {
-    "hono": "^4.0.0"
+    "@better-auth/drizzle-adapter": "^1.7.6",
+    "@better-auth/expo": "^1.7.6",
+    "@libsql/client": "^0.18.0",
+    "@track-social/db": "^0.0.0",
+    "better-auth": "^1.7.6",
+    "drizzle-orm": "^0.45.3",
+    "hono": "^4.0.0",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "typescript": "^6.0.0",

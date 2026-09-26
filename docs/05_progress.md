@@ -8,21 +8,36 @@
 
 - npm workspaces、Expo Routerのアプリ起動土台、Workers + HonoのAPI起動土台。
 - development / staging / productionのWorker構成。
-- Turso / Drizzle用のschemaと初回migration（feature flags、invite codes）。
+- Turso / Drizzle用のschemaとmigration。開発用Turso DBへの接続とmigration適用。
 - 型チェックとGitHub Actionsの検証設定。
 
 ### 未実装
 
-- Better Auth、Apple / Googleログイン、ソーシャルグラフ、投稿、フィード、管理画面。
-- Turso、R2、Stream、Queues等の外部リソース接続。
+- Apple / GoogleのOAuth設定と実機ログイン、ソーシャルグラフ、投稿、フィード、管理画面。
+- R2、Stream、Queues等の外部リソース接続。
 - 本番用のアプリ識別子、署名、ストア設定。
 - UI参照画像の再現。現在のExpo画面は起動確認用。
 
 ### 既知の問題
 
 - テンプレート由来のアイコンと未使用のデモ用ファイルが残っている。UI実装時に参照画像に合わせて置き換える。
-- DB schemaは基盤用の2表だけ。本人・投稿等の表は対応機能を実装するフェーズで追加する。
+- OAuth認証情報が未設定のため、実アカウントの登録と登録完了画面はまだ検証できない。
 
 ### 次フェーズ
 
-- Apple / Google認証の環境要件を確認し、Better Auth、年齢・同意、プロフィール、非公開設定、通報と管理画面の最小経路を実装する。
+- Apple / Google認証情報とアプリ識別子を整え、実機ログインを確認する。続けてフォロー申請、ブロック、通報と管理画面の最小経路を実装する。
+
+## フェーズ1: 本人・安全の土台（進行中）
+
+### 実装済み
+
+- Better AuthとTursoを接続し、認証用のDB表を追加。登録フラグは初期状態で無効。
+- 13歳未満の登録拒否、未成年の初期非公開、16歳未満の公開禁止、16〜17歳の公開時確認をAPIに実装。
+- 登録完了、本人プロフィール取得、ユーザー名空き確認、非公開設定変更のAPIを追加。
+- 年齢境界のテスト、型チェック、未ログイン時のAPIアクセス拒否を確認。
+
+### 未実装・確認点
+
+- Apple / Google OAuthの設定とログインから登録完了までの通し確認。
+- フォロー申請、ブロック、通報、管理画面、監査ログ。
+- 利用規約とプライバシー文書の確定。現在の同意バージョンは開発用の仮値。
