@@ -1,0 +1,23 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "track-social-api",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "logs": { "head_sampling_rate": 1 },
+    "traces": { "enabled": true, "head_sampling_rate": 0.01 }
+  },
+  "env": {
+    "development": {
+      "vars": { "APP_ENV": "development" }
+    },
+    "staging": {
+      "vars": { "APP_ENV": "staging" }
+    },
+    "production": {
+      "vars": { "APP_ENV": "production" }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "track-social",
+  "private": true,
+  "version": "0.0.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "dev:mobile": "npm run start -w @track-social/mobile",
+    "dev:api": "npm run dev -w @track-social/api"
+  }
+}

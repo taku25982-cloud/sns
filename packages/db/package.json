@@ -1,0 +1,23 @@
+{
+  "name": "@track-social/db",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.0",
+    "drizzle-orm": "^0.45.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "drizzle-kit": "^0.31.0",
+    "typescript": "^6.0.0"
+  }
+}
