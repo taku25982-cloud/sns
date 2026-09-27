@@ -98,14 +98,13 @@ export async function isRegistrationEnabled(env: Env): Promise<boolean> {
   return rows[0]?.enabled ?? false;
 }
 
-export async function updatePrivacy(env: Env, authUserId: string, input: unknown) {
+export async function updatePrivacy(env: Env, authUserId: string, input: unknown, db = createDatabase(env)) {
   const parsed = z.object({
     isPrivate: z.boolean(),
     acknowledgePublicRisks: z.boolean().optional(),
   }).safeParse(input);
   if (!parsed.success) return { status: 400 as const, body: { error: 'invalid_input' } };
 
-  const db = createDatabase(env);
   const rows = await db.select({ birthDate: users.birthDate, status: users.status }).from(users)
     .where(eq(users.id, authUserId)).limit(1);
   if (!rows.length || rows[0].status !== 'active') {

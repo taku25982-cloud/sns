@@ -20,9 +20,8 @@ async function blocked(db: ReturnType<typeof createDatabase>, first: string, sec
   return rows.length > 0;
 }
 
-export async function follow(env: Env, actorId: string, targetId: string): Promise<Result> {
+export async function follow(env: Env, actorId: string, targetId: string, db = createDatabase(env)): Promise<Result> {
   if (actorId === targetId) return { status: 400, body: { error: 'self_action' } };
-  const db = createDatabase(env);
   if (!await activeUser(db, actorId)) return { status: 403, body: { error: 'onboarding_required' } };
   const target = await activeUser(db, targetId);
   if (!target || await blocked(db, actorId, targetId)) return { status: 404, body: { error: 'not_found' } };
@@ -50,8 +49,7 @@ export async function unfollow(env: Env, actorId: string, targetId: string): Pro
   return { status: 200, body: { state: 'none' } };
 }
 
-export async function resolveFollowRequest(env: Env, actorId: string, requesterId: string, accept: boolean): Promise<Result> {
-  const db = createDatabase(env);
+export async function resolveFollowRequest(env: Env, actorId: string, requesterId: string, accept: boolean, db = createDatabase(env)): Promise<Result> {
   if (!await activeUser(db, actorId)) return { status: 403, body: { error: 'onboarding_required' } };
   const pending = await db.select({ status: followRequests.status }).from(followRequests)
     .where(and(eq(followRequests.requesterId, requesterId), eq(followRequests.targetId, actorId))).limit(1);
@@ -83,9 +81,8 @@ export async function pendingFollowRequests(env: Env, actorId: string): Promise<
   return { status: 200, body: { requests } };
 }
 
-export async function setBlock(env: Env, actorId: string, targetId: string, enabled: boolean): Promise<Result> {
+export async function setBlock(env: Env, actorId: string, targetId: string, enabled: boolean, db = createDatabase(env)): Promise<Result> {
   if (actorId === targetId) return { status: 400, body: { error: 'self_action' } };
-  const db = createDatabase(env);
   if (!await activeUser(db, actorId)) return { status: 403, body: { error: 'onboarding_required' } };
   if (enabled && !await activeUser(db, targetId)) return { status: 404, body: { error: 'not_found' } };
 

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "wrangler dev --env development",
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test src/age.test.ts",
+    "test": "tsx --test src/*.test.ts",
     "types": "wrangler types --env development",
     "deploy:staging": "wrangler deploy --env staging",
     "deploy:production": "wrangler deploy --env production"
@@ -23,6 +23,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "tsx": "^4.23.15",
     "typescript": "^6.0.0",
     "wrangler": "^4.0.0"
   }
