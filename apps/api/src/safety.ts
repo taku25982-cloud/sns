@@ -23,10 +23,9 @@ async function isActive(db: ReturnType<typeof createDatabase>, id: string) {
   return found.length > 0;
 }
 
-export async function submitReport(env: Env, reporterId: string, input: unknown): Promise<Result> {
+export async function submitReport(env: Env, reporterId: string, input: unknown, db = createDatabase(env)): Promise<Result> {
   const parsed = reportInput.safeParse(input);
   if (!parsed.success) return { status: 400, body: { error: 'invalid_input' } };
-  const db = createDatabase(env);
   if (!await isActive(db, reporterId)) return { status: 403, body: { error: 'onboarding_required' } };
   if (reporterId === parsed.data.targetId) return { status: 400, body: { error: 'self_report' } };
   if (!await isActive(db, parsed.data.targetId)) return { status: 404, body: { error: 'not_found' } };
@@ -51,16 +50,15 @@ export async function submitReport(env: Env, reporterId: string, input: unknown)
   return { status: 201, body: { id, status: 'open' } };
 }
 
-export async function isAdmin(env: Env, userId: string): Promise<boolean> {
-  const db = createDatabase(env);
+export async function isAdmin(env: Env, userId: string, db = createDatabase(env)): Promise<boolean> {
+  if (!await isActive(db, userId)) return false;
   const found = await db.select({ role: adminUsers.role }).from(adminUsers)
     .where(eq(adminUsers.userId, userId)).limit(1);
   return found[0]?.role === 'admin' || found[0]?.role === 'moderator';
 }
 
-export async function reportQueue(env: Env, adminId: string): Promise<Result> {
-  if (!await isAdmin(env, adminId)) return { status: 403, body: { error: 'forbidden' } };
-  const db = createDatabase(env);
+export async function reportQueue(env: Env, adminId: string, db = createDatabase(env)): Promise<Result> {
+  if (!await isAdmin(env, adminId, db)) return { status: 403, body: { error: 'forbidden' } };
   const items = await db.select({
     id: reports.id, targetType: reports.targetType, targetId: reports.targetId,
     reason: reports.reason, priority: reports.priority, createdAt: reports.createdAt,
@@ -69,19 +67,17 @@ export async function reportQueue(env: Env, adminId: string): Promise<Result> {
   return { status: 200, body: { reports: items } };
 }
 
-export async function reportDetail(env: Env, adminId: string, reportId: string): Promise<Result> {
-  if (!await isAdmin(env, adminId)) return { status: 403, body: { error: 'forbidden' } };
-  const db = createDatabase(env);
+export async function reportDetail(env: Env, adminId: string, reportId: string, db = createDatabase(env)): Promise<Result> {
+  if (!await isAdmin(env, adminId, db)) return { status: 403, body: { error: 'forbidden' } };
   const found = await db.select().from(reports).where(eq(reports.id, reportId)).limit(1);
   if (!found.length) return { status: 404, body: { error: 'not_found' } };
   return { status: 200, body: { report: found[0] } };
 }
 
-export async function reviewReport(env: Env, adminId: string, reportId: string, input: unknown): Promise<Result> {
-  if (!await isAdmin(env, adminId)) return { status: 403, body: { error: 'forbidden' } };
+export async function reviewReport(env: Env, adminId: string, reportId: string, input: unknown, db = createDatabase(env)): Promise<Result> {
+  if (!await isAdmin(env, adminId, db)) return { status: 403, body: { error: 'forbidden' } };
   const parsed = reviewInput.safeParse(input);
   if (!parsed.success) return { status: 400, body: { error: 'invalid_input' } };
-  const db = createDatabase(env);
   const found = await db.select().from(reports).where(eq(reports.id, reportId)).limit(1);
   const report = found[0];
   if (!report) return { status: 404, body: { error: 'not_found' } };
@@ -111,7 +107,7 @@ export async function reviewReport(env: Env, adminId: string, reportId: string, 
     await tx.insert(moderationAuditLog).values({
       id: crypto.randomUUID(), actorAdminId: adminId, action: `report_${parsed.data.decision}`,
       targetType: report.targetType, targetId: report.targetId,
-      metadata: JSON.stringify({ reportId, reason: parsed.data.reason }),
+      metadata: JSON.stringify({ reportId, reportReason: report.reason, reviewReason: parsed.data.reason }),
       createdAt: now,
     });
   });
