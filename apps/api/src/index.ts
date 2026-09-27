@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import type { RegistrationStatus } from '@track-social/contracts';
 import { createAuth } from './auth';
-import { cancelAccountDeletion, getAccountDeletion, requestAccountDeletion } from './deletion';
+import { cancelAccountDeletion, getAccountDeletion, isAccountDeletionReady, requestAccountDeletion } from './deletion';
 import { completeOnboarding, getMyProfile, isRegistrationEnabled, updatePrivacy, usernameAvailable } from './onboarding';
 import { follow, pendingFollowRequests, resolveFollowRequest, setBlock, setMute, unfollow } from './social';
 import { reportDetail, reportQueue, reviewReport, submitReport } from './safety';
@@ -40,6 +40,7 @@ app.get('/v1/me/deletion', async (context) => {
 app.post('/v1/me/deletion', bodyLimit({ maxSize: 1024 }), async (context) => {
   const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
   if (!session) return context.json({ error: 'unauthorized' }, 401);
+  if (!await isAccountDeletionReady(context.env)) return context.json({ error: 'deletion_unavailable' }, 503);
   let input: unknown;
   try {
     input = await context.req.json();

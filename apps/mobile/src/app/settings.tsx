@@ -18,6 +18,7 @@ export default function SettingsScreen() {
     <SafetySection title="応援プラン"><SafetyRow label="応援プラン" detail="バッジ・限定機能・陸上をもっと楽しむ" icon="ribbon-outline" value="準備中" /></SafetySection>
     <SafetySection title="ヘルプ"><SafetyRow label="よくある質問" detail="使い方・トラブルシューティング" icon="help-circle-outline" value="準備中" /></SafetySection>
     <SafetySection title=""><SafetyRow label="ログアウト" detail="このアカウントからログアウトします" icon="log-out-outline" value="未接続" danger /></SafetySection>
+    <SafetySection title=""><SafetyRow label="アカウントを削除" detail="削除申請と取消について確認します" icon="trash-outline" onPress={() => router.push('./delete-account')} danger /></SafetySection>
     <PreviewNotice />
   </SafetyScreen>;
 }

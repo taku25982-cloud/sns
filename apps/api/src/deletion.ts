@@ -1,8 +1,14 @@
 import { and, eq } from 'drizzle-orm';
-import { accountDeletionRequests, users } from '@track-social/db/schema';
+import { accountDeletionRequests, featureFlags, users } from '@track-social/db/schema';
 import { createDatabase } from './db';
 
 const CANCELLATION_DAYS = 30;
+
+export async function isAccountDeletionReady(env: Env, db = createDatabase(env)) {
+  const rows = await db.select({ enabled: featureFlags.enabled }).from(featureFlags)
+    .where(eq(featureFlags.key, 'account_deletion_enabled')).limit(1);
+  return rows[0]?.enabled ?? false;
+}
 
 export async function requestAccountDeletion(
   env: Env, userId: string, input: unknown, db = createDatabase(env), now = new Date(),

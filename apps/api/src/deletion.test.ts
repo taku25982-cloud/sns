@@ -6,7 +6,7 @@ import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
 import { eq } from 'drizzle-orm';
 import * as schema from '@track-social/db/schema';
-import { cancelAccountDeletion, getAccountDeletion, requestAccountDeletion } from './deletion';
+import { cancelAccountDeletion, getAccountDeletion, isAccountDeletionReady, requestAccountDeletion } from './deletion';
 import { getMyProfile } from './onboarding';
 import { follow } from './social';
 
@@ -18,6 +18,7 @@ test('deletion request hides the account immediately and cancellation restores i
   try {
     await migrate(db, { migrationsFolder: fileURLToPath(new URL('../../../packages/db/drizzle/', import.meta.url)) });
     const now = new Date('2026-09-27T00:00:00Z');
+    assert.equal(await isAccountDeletionReady(env, db), false);
     for (const id of ['owner', 'viewer']) {
       await db.insert(schema.authUser).values({ id, name: id, email: `${id}@example.invalid`, createdAt: now, updatedAt: now });
       await db.insert(schema.users).values({
