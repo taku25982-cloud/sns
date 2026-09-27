@@ -21,3 +21,20 @@ export const onboardingSchema = z.object({
   acceptPrivacy: z.literal(true),
 });
 export type OnboardingInput = z.infer<typeof onboardingSchema>;
+
+export const feedPostSchema = z.object({
+  id: z.string(),
+  authorId: z.string(),
+  username: z.string(),
+  displayName: z.string(),
+  text: z.string(),
+  visibility: z.enum(['public', 'followers']),
+  eventTag: z.string().nullable(),
+  createdAt: z.iso.datetime(),
+});
+export const feedResponseSchema = z.object({
+  posts: z.array(feedPostSchema),
+  nextCursor: z.string().nullable(),
+});
+export type FeedPost = z.infer<typeof feedPostSchema>;
+export type FeedResponse = z.infer<typeof feedResponseSchema>;

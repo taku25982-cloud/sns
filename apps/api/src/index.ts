@@ -3,6 +3,7 @@ import { bodyLimit } from 'hono/body-limit';
 import type { RegistrationStatus } from '@track-social/contracts';
 import { createAuth } from './auth';
 import { cancelAccountDeletion, getAccountDeletion, isAccountDeletionReady, requestAccountDeletion } from './deletion';
+import { getFeed } from './feed';
 import { completeOnboarding, getMyProfile, isRegistrationEnabled, updatePrivacy, usernameAvailable } from './onboarding';
 import { createPost, deletePost, getPost } from './posts';
 import { follow, pendingFollowRequests, resolveFollowRequest, setBlock, setMute, unfollow } from './social';
@@ -83,6 +84,15 @@ app.delete('/v1/posts/:id', async (context) => {
   const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
   if (!session) return context.json({ error: 'unauthorized' }, 401);
   const result = await deletePost(context.env, session.user.id, context.req.param('id'));
+  return context.json(result.body, result.status);
+});
+
+app.get('/v1/feed', async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  const result = await getFeed(context.env, session.user.id, {
+    tab: context.req.query('tab'), cursor: context.req.query('cursor'),
+  });
   return context.json(result.body, result.status);
 });
 
