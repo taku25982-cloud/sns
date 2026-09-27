@@ -56,6 +56,7 @@
 - Better Auth Expoクライアントと認証付きAPI呼び出しの土台、公開の登録状態APIを追加。開発APIの登録停止状態（`enabled: false`）を確認済み。
 - 設定・プライバシー・通報の参照画像との差をExpo Webのスマートフォン幅で確認して調整済み（記録: `design-qa.md`）。
 - UI参照画像19点を画面ID・基準状態・実装状況へ対応付け、画像のない画面と状態を `06_ui_reference_inventory.md` に整理。
+- PCのWi-Fiアドレスで開発APIのhealthと登録停止を確認。モバイルのローカル接続先をGit管理外に設定。Expo Goを維持しつつDevelopment Build用の依存関係とEAS profileを追加し、型チェックとiOS JS bundle書き出しを確認。iPhoneからの到達とOAuth実機認証は未確認。
 
 ### 未実装・確認点
 
