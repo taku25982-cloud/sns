@@ -6,6 +6,7 @@ import { drizzle } from 'drizzle-orm/libsql';
 import { migrate } from 'drizzle-orm/libsql/migrator';
 import * as schema from '@track-social/db/schema';
 import { getFeed } from './feed';
+import { createPost, deletePost } from './posts';
 
 const env = {} as Env;
 
@@ -68,6 +69,25 @@ test('feed filters private, blocked, muted and inactive authors and paginates ti
     assert.ok(followingPosts.some((item) => item.authorId === 'privateAuthor' && item.visibility === 'followers'));
     assert.ok(followingPosts.every((item) => !['blockedAuthor', 'mutedAuthor', 'pendingAuthor'].includes(item.authorId)));
     assert.equal((await getFeed(env, 'viewer', { tab: 'recommended', cursor: 'bad' }, db)).status, 400);
+
+    const created = await createPost(env, 'viewer', { text: '今日の練習', visibility: 'followers' }, db);
+    assert.equal(created.status, 201);
+    const ownPostId = created.body.id as string;
+    for (const tab of ['recommended', 'following'] as const) {
+      const feed = await getFeed(env, 'viewer', { tab }, db);
+      assert.equal(feed.status, 200);
+      if (feed.status !== 200) throw new Error('feed unavailable');
+      assert.ok((feed.body.posts as { id: string }[]).some((item) => item.id === ownPostId));
+    }
+    const outsiderFeed = await getFeed(env, 'newAuthor', { tab: 'recommended' }, db);
+    assert.equal(outsiderFeed.status, 200);
+    if (outsiderFeed.status !== 200) throw new Error('feed unavailable');
+    assert.ok(!(outsiderFeed.body.posts as { id: string }[]).some((item) => item.id === ownPostId));
+    assert.equal((await deletePost(env, 'viewer', ownPostId, db)).status, 200);
+    const afterDelete = await getFeed(env, 'viewer', { tab: 'following' }, db);
+    assert.equal(afterDelete.status, 200);
+    if (afterDelete.status !== 200) throw new Error('feed unavailable');
+    assert.ok(!(afterDelete.body.posts as { id: string }[]).some((item) => item.id === ownPostId));
   } finally {
     client.close();
   }

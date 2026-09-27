@@ -33,9 +33,9 @@ export async function getFeed(env: Env, viewerId: string, input: unknown, db = c
   const notMuted = notExists(db.select({ id: mutes.muterId }).from(mutes)
     .where(and(eq(mutes.muterId, viewerId), eq(mutes.mutedId, posts.authorId))));
   const source = parsed.data.tab === 'following'
-    ? exists(db.select({ id: follows.followerId }).from(follows)
-      .where(and(eq(follows.followerId, viewerId), eq(follows.followeeId, posts.authorId))))
-    : and(eq(posts.visibility, 'public'), eq(profiles.isPrivate, false));
+    ? or(eq(posts.authorId, viewerId), exists(db.select({ id: follows.followerId }).from(follows)
+      .where(and(eq(follows.followerId, viewerId), eq(follows.followeeId, posts.authorId)))))
+    : or(eq(posts.authorId, viewerId), and(eq(posts.visibility, 'public'), eq(profiles.isPrivate, false)));
 
   const rows = await db.select({
     id: posts.id, authorId: posts.authorId, username: profiles.username,
