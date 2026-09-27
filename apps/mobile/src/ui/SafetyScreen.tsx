@@ -38,9 +38,10 @@ export function SafetySection({ title, children }: { title: string; children: Re
   </View>;
 }
 
-export function SafetyRow({ label, value, onPress, danger = false }: { label: string; value?: string; onPress?: () => void; danger?: boolean }) {
+export function SafetyRow({ label, value, detail, icon, onPress, danger = false }: { label: string; value?: string; detail?: string; icon?: keyof typeof Ionicons.glyphMap; onPress?: () => void; danger?: boolean }) {
   return <Pressable disabled={!onPress} onPress={onPress} accessibilityRole={onPress ? 'button' : 'text'} style={styles.row}>
-    <Text style={[styles.rowLabel, danger && styles.danger]}>{label}</Text>
+    {icon && <Ionicons name={icon} size={25} color={danger ? '#E14B4B' : theme.navy} style={styles.rowIcon} />}
+    <View style={styles.rowCopy}><Text style={[styles.rowLabel, danger && styles.danger]}>{label}</Text>{detail && <Text style={styles.rowDetail}>{detail}</Text>}</View>
     <View style={styles.rowEnd}>{value && <Text style={styles.value}>{value}</Text>}{onPress && <Ionicons name="chevron-forward" size={20} color="#9BA5B5" />}</View>
   </Pressable>;
 }
@@ -54,12 +55,15 @@ const styles = StyleSheet.create({
   header: { height: 58, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 14 },
   back: { width: 44, height: 44, alignItems: 'center', justifyContent: 'center' },
   content: { paddingHorizontal: 22, paddingBottom: 32 },
-  title: { fontSize: 26, fontWeight: '800', color: theme.navy, marginTop: 20, marginBottom: 24 },
-  section: { marginBottom: 20, backgroundColor: theme.canvas, borderRadius: 15, overflow: 'hidden' },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#697589', paddingHorizontal: 17, paddingVertical: 11 },
+  title: { fontSize: 30, fontWeight: '800', color: theme.navy, marginTop: 20, marginBottom: 20 },
+  section: { marginBottom: 10, backgroundColor: '#F1F5FA', borderRadius: 12, overflow: 'hidden' },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#73819B', paddingHorizontal: 12, paddingVertical: 9 },
   sectionBody: { backgroundColor: 'white', marginHorizontal: 4, marginBottom: 4, borderRadius: 11 },
-  row: { minHeight: 54, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.border, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  row: { minHeight: 58, borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: theme.border, paddingHorizontal: 15, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  rowIcon: { width: 38 },
+  rowCopy: { flex: 1, paddingVertical: 8 },
   rowLabel: { fontSize: 16, color: theme.navy, fontWeight: '600' },
+  rowDetail: { color: theme.muted, fontSize: 12, marginTop: 3 },
   danger: { color: '#E14B4B' },
   rowEnd: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   value: { color: theme.muted, fontSize: 13 },
