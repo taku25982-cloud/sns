@@ -1,6 +1,6 @@
 # 削除・調査記録の保持方針（公開前の決定事項）
 
-**状態:** 設計案。利用規約・プライバシーポリシーの確定文面ではない。  
+**状態:** 設計案。利用規約・プライバシーポリシーの確定文面ではない。
 **根拠:** `01_product_requirements_and_architecture.md` 5.6、`02_ui_screen_spec.md` SET-001、`03_cold_start_rollout_operations.md` Solo Alpha。
 
 | データ | 削除申請直後 | 30日の取消期限後 | 公開前に決めること |
