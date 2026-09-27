@@ -3,6 +3,7 @@
 **対象:** 陸上SNS（仮称）  
 **状態:** 実装中の計画（2026-09-27 更新）
 **前提:** `01_product_requirements_and_architecture.md`、`02_ui_screen_spec.md`、`03_cold_start_rollout_operations.md` を正とする。
+**加入状況:** Apple Developer Programは未加入。加入前に可能な実装を先に進め、加入後にiPhone実機の認証・署名・配布を検証する。
 
 ## 1. 現状と到達点
 
@@ -40,6 +41,8 @@
 
 各フェーズ終了時に「実装済み / 未実装 / 既知の問題 / 次フェーズ」を記録する。Production v1の機能を勝手に削らず、公開範囲はflagで分ける。
 
+Apple Developer Program加入前は各フェーズの**実装と開発環境での検証**を進められるが、AppleログインやiPhone実機ビルドを含む完了条件は加入後まで保留する。保留した検証を「完了」と記録しない。
+
 ### UI実装の着手順（2026-09-26 変更）
 
 本人・安全APIの残作業と並行して、画面を早めに作る。フェーズ1の完了条件やフェーズ5の画像比較を省略する変更ではない。
@@ -63,12 +66,40 @@
 
 1. GitHub remote、CI、環境別secrets。
 2. Cloudflare Workers / R2 / Queues / Durable Objects / StreamとTurso。必要な機能のフェーズで順に有効化する。
-3. Apple / Google認証とEASのアプリ識別子・署名・ビルド設定。
+3. GoogleのWeb向けOAuthとHTTPSの開発callbackは加入前にも準備できる。Appleログイン資格情報、iOSアプリ識別子・署名、EASのiPhone実機ビルドは加入後に設定する。
 4. PostHog / SentryはPIIを送らない設定、RevenueCatは購入実装のフェーズで接続。
 
 外部サービスの接続では、設定値と必要な権限を先に確認し、利用可能なMCPを使える場合はそれを利用する。課金プランの変更や本番公開は具体的な費用・影響が分かる状態で判断する。
 
-## 7. 進捗と直近の作業（2026-09-27）
+## 7. Apple Developer Program加入前と加入後の作業
+
+### 加入前に進める作業
+
+| 順序 | 作業 | この段階の確認点 |
+| --- | --- | --- |
+| A1 | フェーズ0の残り: API契約、staging構成、秘密情報の分離、CI・migration・登録flagを整える。規約・プライバシー文書と削除・通報の保持方針は公開前の確定事項として準備する | dev / stagingの疎通を再現でき、登録はOFF。文書が仮の間は外部登録を始めない |
+| A2 | フェーズ1の安全機能を先に完成させる。開発専用の隔離DBとテスト用IDで年齢、非公開閲覧、フォロー、ブロック、通報・審査、停止、削除を検証する。アプリには認証後の画面遷移・loading / error / restricted状態を実装する | テスト用IDは隔離したdev / CIだけで使用し、公開Workerに認証回避経路を作らない。Appleログインの実機確認は保留 |
+| A3 | GoogleのWeb OAuthを必要に応じて開発環境で検証する。HTTPS callbackと登録OFFの制御を整える。iPhone用Googleログインの最終確認は加入後へ残す | Webでのログインが成功してもiOS実機の合格とは扱わない |
+| A4 | フェーズ2の投稿・写真・コメント・フィード・検索と対応画面を実装する。R2等は必要になった段階でdev環境から接続する | 隔離した複数IDで公開/非公開の取得可否、フォロワー0の候補表示、編集・削除を検証。架空データを本番へ入れない |
+| A5 | フェーズ3の通報管理、異議申し立て、削除ジョブ、通知のサーバー処理、費用・エラー監視を作る。フェーズ4のDM・動画・応援プランは安全条件と費用を確認して実装を進める | APNs実機push、App Store購入・復元、ネイティブ権限の最終確認は加入後へ残す。公開flagはOFF |
+| A6 | Expo Goで画面遷移と見た目を確認し、Web/APIで結合・回帰テストを進める。UI参照画像との差を記録する | OAuth、iPhone固有の権限・通知・購入、TestFlightの結果を含まない「加入前の検証済み」状態まで |
+
+加入前はA1→A2を優先する。A2の安全境界が確認できてからA4へ進む。A3は開発用HTTPS環境とGoogle認証情報が利用できるときに並行する。A5の外部サービスや費用が発生する機能は、実装時に必要性を再評価する。
+
+### 加入後に進める作業
+
+| 順序 | 作業 | 完了条件 |
+| --- | --- | --- |
+| B1 | 加入資格とApple Developerの利用可能な権限を確認し、アプリ識別子、署名、実機の登録を行う。EASでDevelopment Buildを作る | 自分のiPhoneにビルドを入れて起動できる。加入・契約・支払いと本人確認の操作はアカウント所有者が行う |
+| B2 | AppleのApp ID / Service ID / キー、GoogleのiOS向け設定、HTTPS callback、Better Authを接続する | Apple / Googleで実機ログインし、登録→初期設定→再起動後のセッション復元を確認できる |
+| B3 | 一人で複数の開発用アカウントを使い、未成年・非公開・停止・通報・削除を実機で通す。実機写真権限、push、DM、動画、購入・復元も該当機能の公開前に確認する | `01` の安全条件と`02`のUI完了条件を満たし、画像との差分を修正する |
+| B4 | TestFlightとストア提出物、プライバシー表示、費用・監視・復旧を確認してSolo Alphaへ進む | 登録上限と停止flagを維持したまま、`03`の段階公開基準を満たす |
+
+Expo GoではOAuthのカスタムschemeを使う実機確認ができない。WindowsからEASでiPhone向けDevelopment Buildを作るにはApple Developerの署名資格が必要。Appleログインの資格情報はDeveloper Portalで取得する。加入までこの3点をB1/B2の保留事項とする。加入条件には居住地域の成年年齢があるため、申込前にAppleの条件を確認する。
+
+確認資料: [Expo OAuth](https://docs.expo.dev/guides/authentication/)、[Expo iPhone向けEAS Build](https://docs.expo.dev/tutorial/eas/ios-development-build-for-devices/)、[Better Auth Apple](https://better-auth.com/docs/authentication/apple)、[Apple加入条件](https://developer.apple.com/programs/enroll/)。
+
+## 8. 進捗と直近の作業（2026-09-27）
 
 ### 計画との照合
 
@@ -80,16 +111,16 @@
 | UI着手順 2 | 初期実装済み | 設定・プライバシー・通報をExpo Webで参照画像と比較。iPhone実機での最終画像比較と保存・送信は未実施 |
 | UI着手順 3 | 一部完了 | Better Auth Expoクライアント、認証付きAPI呼び出しの土台、登録状態APIを追加。開発APIでは登録停止を確認。OAuth・規約・プライバシー文書と画面からのログイン接続は未完了 |
 | UI参照画像の棚卸し | 完了 | 画像19点を画面ID・状態・実装状況と照合し、画像のない状態と正式仕様との相違を `06_ui_reference_inventory.md` に記録。iPhone実機の寸法・比較は未完了 |
-| 開発用OAuth・実機接続準備 | 進行中 | PCのWi-Fiアドレスで開発APIのhealthと登録停止を確認。モバイルのローカル接続先を設定し、Development Buildの依存関係とEAS profileを追加。iPhoneからの到達、iOS Bundle ID、署名、OAuth認証情報、HTTPS callbackは未確認・未設定 |
+| 開発用OAuth・実機接続準備 | 加入前の準備は一部完了 | PCのWi-Fiアドレスで開発APIのhealthと登録停止を確認。モバイルのローカル接続先、Development Buildの依存関係とEAS profileを追加。iPhoneからの到達、iOS Bundle ID、署名、OAuth認証情報、HTTPS callbackは未確認・未設定 |
 | UI着手順 4 / フェーズ2以降 | 未着手 | 投稿・フィード・検索・通知・DM等の本機能と公開準備が残る |
 
-実装順の逸脱はない。フェーズ0・1の完了前にUIプレビューを先行させる順序は上記に明記済み。ただし、このファイルの進捗欄は更新が遅れていたため今回修正した。UIの初期実装をフェーズ完了とは扱わない。
+Apple Developer Program未加入の間は上記A1〜A6を進める。フェーズ0・1の完了前にUIプレビューを先行させた順序は記録済み。UIの初期実装をフェーズ完了とは扱わない。
 
 ### 次に行う順序
 
 1. `06_ui_reference_inventory.md` の対応表は作成済み。既存画面のiPhone実機比較は、撮影できる状態で実施する。
-2. PC側の開発API疎通とDevelopment Build profileは準備済み。次はiPhoneからのAPI到達確認、iOS Bundle IDと署名の準備、外部から到達できるHTTPSの認証callback先、Apple / Google OAuthの順に整える。Expo Goは画面確認に使い、OAuthの実機検証にはカスタムschemeを持つDevelopment Buildを使う。正式な利用規約・プライバシー文書と同意フローを確定するまで登録受付はOFFのままにする。
-3. ログイン・初期設定・本人プロフィール・非公開設定を画面からAPIへ接続し、一人で複数の開発用アカウントを使って年齢境界、閲覧権限、停止状態を確認する。
-4. フェーズ1の残る通報・管理機能と検証を終えてから、投稿・フィードへ進む。
+2. Apple Developer Programへの加入を待たず、A1のAPI契約・staging構成と、A2の隔離した安全機能テストを進める。iPhoneからの開発API到達確認と既存画面の比較はExpo Goで可能な範囲で実施する。
+3. A2の安全境界を確認してから投稿・フィードを実装する。Google Web OAuthは開発用HTTPS環境が整えば並行して進める。
+4. 加入後はB1〜B4に進み、Apple / Googleの実機ログインと残るネイティブ機能・配布を確認する。正式な利用規約・プライバシー文書と同意フローが確定するまで登録受付はOFFのままにする。
 
 この表は各作業の完了時に更新し、詳細な実装記録は `05_progress.md` に残す。
