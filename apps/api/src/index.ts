@@ -4,6 +4,7 @@ import type { RegistrationStatus } from '@track-social/contracts';
 import { createAuth } from './auth';
 import { cancelAccountDeletion, getAccountDeletion, isAccountDeletionReady, requestAccountDeletion } from './deletion';
 import { completeOnboarding, getMyProfile, isRegistrationEnabled, updatePrivacy, usernameAvailable } from './onboarding';
+import { createPost, deletePost, getPost } from './posts';
 import { follow, pendingFollowRequests, resolveFollowRequest, setBlock, setMute, unfollow } from './social';
 import { reportDetail, reportQueue, reviewReport, submitReport } from './safety';
 
@@ -55,6 +56,33 @@ app.post('/v1/me/deletion/cancel', async (context) => {
   const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
   if (!session) return context.json({ error: 'unauthorized' }, 401);
   const result = await cancelAccountDeletion(context.env, session.user.id);
+  return context.json(result.body, result.status);
+});
+
+app.post('/v1/posts', bodyLimit({ maxSize: 8 * 1024 }), async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  let input: unknown;
+  try {
+    input = await context.req.json();
+  } catch {
+    return context.json({ error: 'invalid_json' }, 400);
+  }
+  const result = await createPost(context.env, session.user.id, input);
+  return context.json(result.body, result.status);
+});
+
+app.get('/v1/posts/:id', async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  const result = await getPost(context.env, session.user.id, context.req.param('id'));
+  return context.json(result.body, result.status);
+});
+
+app.delete('/v1/posts/:id', async (context) => {
+  const session = await createAuth(context.env).api.getSession({ headers: context.req.raw.headers });
+  if (!session) return context.json({ error: 'unauthorized' }, 401);
+  const result = await deletePost(context.env, session.user.id, context.req.param('id'));
   return context.json(result.body, result.status);
 });
 

@@ -70,6 +70,21 @@ export const accountDeletionRequests = sqliteTable('account_deletion_requests', 
   cancelledAt: integer('cancelled_at', { mode: 'timestamp_ms' }),
 });
 
+export const posts = sqliteTable('posts', {
+  id: text('id').primaryKey(),
+  authorId: text('author_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  text: text('text').notNull(),
+  visibility: text('visibility').notNull(),
+  eventTag: text('event_tag'),
+  status: text('status').notNull().default('published'),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
+  deletedAt: integer('deleted_at', { mode: 'timestamp_ms' }),
+}, (table) => [
+  index('posts_author_created_idx').on(table.authorId, table.createdAt),
+  index('posts_status_created_idx').on(table.status, table.createdAt),
+]);
+
 export const profiles = sqliteTable('profiles', {
   userId: text('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
   username: text('username').notNull().unique(),
