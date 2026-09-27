@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { Brand } from '../ui/Brand';
 import { theme } from '../ui/theme';
 
@@ -41,6 +42,16 @@ export default function HomeScreen() {
             <Text style={styles.emptyText}>{feedTab === 'おすすめ' ? '陸上の投稿が集まるまで、少しお待ちください。' : 'フォローした人の投稿が、ここに表示されます。'}</Text>
           </ScrollView>
         </>
+      ) : active === 'マイページ' ? (
+        <View style={styles.otherContent}>
+          <Text style={styles.otherTitle}>マイページ</Text>
+          <Text style={styles.emptyText}>開発プレビューです。アカウント情報はまだ表示できません。</Text>
+          <Pressable onPress={() => router.push('/settings')} accessibilityRole="button" style={styles.settingsLink}>
+            <Ionicons name="settings-outline" size={22} color={theme.blue} />
+            <Text style={styles.settingsText}>設定を開く</Text>
+            <Ionicons name="chevron-forward" size={20} color={theme.blue} />
+          </Pressable>
+        </View>
       ) : (
         <View style={styles.otherContent}>
           <Text style={styles.otherTitle}>{active}</Text>
@@ -75,6 +86,8 @@ const styles = StyleSheet.create({
   emptyText: { color: theme.muted, fontSize: 14, lineHeight: 22, textAlign: 'center', marginTop: 8 },
   otherContent: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 30 },
   otherTitle: { color: theme.navy, fontSize: 24, fontWeight: '700' },
+  settingsLink: { width: '100%', marginTop: 26, minHeight: 56, borderRadius: 14, backgroundColor: theme.canvas, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', gap: 10 },
+  settingsText: { flex: 1, color: theme.navy, fontSize: 16, fontWeight: '700' },
   bottomBar: { height: 68, borderTopWidth: 1, borderColor: theme.border, flexDirection: 'row', backgroundColor: 'white' },
   bottomTab: { flex: 1, minHeight: 60, alignItems: 'center', justifyContent: 'center', gap: 3 },
   bottomLabel: { color: '#5D6679', fontSize: 10 },
