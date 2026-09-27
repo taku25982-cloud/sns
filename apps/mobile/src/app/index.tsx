@@ -5,11 +5,27 @@ import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Brand } from '../ui/Brand';
 import { theme } from '../ui/theme';
+import { apiBaseURL } from '../lib/auth-client';
 
 export default function LoginScreen() {
   const [notice, setNotice] = useState('');
-  const showNotice = () => {
-    const message = 'ログインの設定中です。現在はアカウントを作成できません。';
+  const showNotice = async () => {
+    let message = 'ログインの設定中です。現在はアカウントを作成できません。';
+    if (apiBaseURL) {
+      try {
+        const response = await fetch(`${apiBaseURL}/v1/registration/status`);
+        if (response.ok) {
+          const status = await response.json() as { enabled?: boolean };
+          message = status.enabled
+            ? '登録受付は有効ですが、Apple・Googleログインはまだ接続されていません。'
+            : '現在、新規登録を受け付けていません。';
+        } else {
+          message = '登録受付の状態を確認できませんでした。';
+        }
+      } catch {
+        message = 'APIに接続できませんでした。開発用の接続先を確認してください。';
+      }
+    }
     setNotice(message);
     if (Platform.OS !== 'web') Alert.alert('準備中', message);
   };

@@ -11,6 +11,10 @@ app.get('/v1/health', (context) => {
   return context.json({ status: 'ok', environment: context.env.APP_ENV });
 });
 
+app.get('/v1/registration/status', async (context) => {
+  return context.json({ enabled: await isRegistrationEnabled(context.env) });
+});
+
 app.all('/api/auth/*', async (context) => {
   const allowSignUp = await isRegistrationEnabled(context.env);
   return createAuth(context.env, allowSignUp).handler(context.req.raw);

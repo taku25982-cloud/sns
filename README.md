@@ -23,3 +23,5 @@ npm run dev:api
 ## 外部サービス
 
 開発用Turso DBを接続済みです。staging / productionのDBと認証情報は未設定です。Apple / Google OAuthの設定後に実機ログインを確認します。接続情報と秘密情報はリポジトリへ保存しません。
+
+モバイルのAPI接続先は `apps/mobile/.env.example` を参考に `apps/mobile/.env.local` の `EXPO_PUBLIC_API_URL` で設定します。iPhone実機ではPCのLAN内IPなど、端末から到達できるURLを使います。`EXPO_PUBLIC_` の値はアプリに公開されるため秘密情報を入れません。登録状態は `GET /v1/registration/status` で確認でき、現在は登録停止中です。OAuth認証情報と正式な規約・プライバシー文書が揃うまでログインボタンは有効化しません。
