@@ -128,7 +128,7 @@ export default function HomeScreen() {
       )}
       <View style={styles.bottomBar} accessibilityRole="tablist">
         {tabs.map((tab) => (
-          <Pressable key={tab.label} onPress={() => setActive(tab.label)} accessibilityRole="tab" accessibilityState={{ selected: active === tab.label }} style={styles.bottomTab}>
+          <Pressable key={tab.label} onPress={() => tab.label === '投稿' ? router.push('./compose') : setActive(tab.label)} accessibilityRole="tab" accessibilityState={{ selected: active === tab.label }} style={styles.bottomTab}>
             <Ionicons name={tab.icon} size={27} color={active === tab.label ? theme.blue : '#4C5569'} />
             <Text style={[styles.bottomLabel, active === tab.label && styles.bottomLabelActive]}>{tab.label}</Text>
           </Pressable>

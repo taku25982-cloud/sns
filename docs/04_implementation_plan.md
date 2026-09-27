@@ -1,7 +1,7 @@
 # 04 実装計画
 
 **対象:** 陸上SNS（仮称）  
-**状態:** 実装中の計画（2026-09-27 更新）
+**状態:** 実装中の計画（2026-09-28 更新）
 **前提:** `01_product_requirements_and_architecture.md`、`02_ui_screen_spec.md`、`03_cold_start_rollout_operations.md` を正とする。
 **加入状況:** Apple Developer Programは未加入。加入前に可能な実装を先に進め、加入後にiPhone実機の認証・署名・配布を検証する。
 
@@ -99,7 +99,7 @@ Expo GoではOAuthのカスタムschemeを使う実機確認ができない。Wi
 
 確認資料: [Expo OAuth](https://docs.expo.dev/guides/authentication/)、[Expo iPhone向けEAS Build](https://docs.expo.dev/tutorial/eas/ios-development-build-for-devices/)、[Better Auth Apple](https://better-auth.com/docs/authentication/apple)、[Apple加入条件](https://developer.apple.com/programs/enroll/)。
 
-## 8. 進捗と直近の作業（2026-09-27）
+## 8. 進捗と直近の作業（2026-09-28）
 
 ### 計画との照合
 
@@ -112,7 +112,7 @@ Expo GoではOAuthのカスタムschemeを使う実機確認ができない。Wi
 | UI着手順 3 | 一部完了 | Better Auth Expoクライアント、認証付きAPI呼び出しの土台、登録状態APIを追加。開発APIでは登録停止を確認。OAuth・規約・プライバシー文書と画面からのログイン接続は未完了 |
 | UI参照画像の棚卸し | 完了 | 画像19点を画面ID・状態・実装状況と照合し、画像のない状態と正式仕様との相違を `06_ui_reference_inventory.md` に記録。iPhone実機の寸法・比較は未完了 |
 | 開発用OAuth・実機接続準備 | 加入前の準備は一部完了 | PCのWi-Fiアドレスで開発APIのhealthと登録停止を確認。モバイルのローカル接続先、Development Buildの依存関係とEAS profileを追加。iPhoneからの到達、iOS Bundle ID、署名、OAuth認証情報、HTTPS callbackは未確認・未設定 |
-| UI着手順 4 / フェーズ2以降 | 一部着手 | テキスト投稿と2種類のフィードAPIを追加し、隔離DBで閲覧権限・ページ送りを検証。ホームは実データ取得と空・未ログイン・エラー状態を実装。投稿画面、写真、正式な推薦、多様性、検索、通知、DMと実ログインでの確認は未完了 |
+| UI着手順 4 / フェーズ2以降 | 一部着手 | テキスト投稿と2種類のフィードAPIを追加し、隔離DBで閲覧権限・ページ送りを検証。ホームの実データ取得と、投稿画面の本文・種目・公開範囲・下書き保存・投稿API接続を実装。写真、ハッシュタグ、正式な推薦、多様性、検索、通知、DMと実ログインでの確認は未完了 |
 
 Apple Developer Program未加入の間は上記A1〜A6を進める。フェーズ0・1の完了前にUIプレビューを先行させた順序は記録済み。UIの初期実装をフェーズ完了とは扱わない。
 
@@ -120,7 +120,7 @@ Apple Developer Program未加入の間は上記A1〜A6を進める。フェー�
 
 1. `06_ui_reference_inventory.md` の対応表は作成済み。既存画面のiPhone実機比較は、撮影できる状態で実施する。
 2. Apple Developer Programへの加入を待たず、A1の残るAPI契約・staging構成と、A2の実ログイン以外の安全機能・削除画面を進める。iPhoneからの開発API到達確認と既存画面の比較はExpo Goで可能な範囲で実施する。最終削除ジョブは保持方針を確定してから実装する。
-3. A2の隔離DBで確認した安全境界を使い、A4のテキスト投稿と初期フィードAPIに着手した。次は投稿画面と実データ結合、正式な推薦・多様性を進める。実ログインでの確認とA2の残作業が済むまでフェーズ2完了にはしない。Google Web OAuthは開発用HTTPS環境が整えば並行して進める。
+3. A2の隔離DBで確認した安全境界を使い、A4のテキスト投稿・初期フィードAPIと投稿画面を実装した。次は実ログインで投稿からフィードへの結合を確認し、写真・正式な推薦・多様性を進める。実ログインでの確認とA2の残作業が済むまでフェーズ2完了にはしない。Google Web OAuthは開発用HTTPS環境が整えば並行して進める。
 4. 加入後はB1〜B4に進み、Apple / Googleの実機ログインと残るネイティブ機能・配布を確認する。正式な利用規約・プライバシー文書と同意フローが確定するまで登録受付はOFFのままにする。
 
 この表は各作業の完了時に更新し、詳細な実装記録は `05_progress.md` に残す。

@@ -1,15 +1,8 @@
 import { and, eq, or } from 'drizzle-orm';
-import { z } from 'zod';
-import { eventCodes } from '@track-social/contracts';
+import { createPostSchema } from '@track-social/contracts';
 import { blocks, follows, posts, profiles, users } from '@track-social/db/schema';
 import { ageOnDate, todayInJapan } from './age';
 import { createDatabase } from './db';
-
-const createPostSchema = z.object({
-  text: z.string().trim().min(1).max(2000),
-  visibility: z.enum(['public', 'followers']).default('followers'),
-  eventTag: z.enum(eventCodes).nullable().optional(),
-});
 
 export async function createPost(env: Env, authorId: string, input: unknown, db = createDatabase(env)) {
   const parsed = createPostSchema.safeParse(input);

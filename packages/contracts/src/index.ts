@@ -38,3 +38,10 @@ export const feedResponseSchema = z.object({
 });
 export type FeedPost = z.infer<typeof feedPostSchema>;
 export type FeedResponse = z.infer<typeof feedResponseSchema>;
+
+export const createPostSchema = z.object({
+  text: z.string().trim().min(1).max(500),
+  visibility: z.enum(['public', 'followers']).default('followers'),
+  eventTag: z.enum(eventCodes).nullable().optional(),
+});
+export type CreatePostInput = z.infer<typeof createPostSchema>;

@@ -33,6 +33,7 @@ test('post access respects teen privacy, followers, blocks, deletion, and accoun
     assert.deepEqual(await createPost(env, 'teen', { text: '練習', visibility: 'public' }, db), {
       status: 403, body: { error: 'public_post_unavailable' },
     });
+    assert.equal((await createPost(env, 'adult', { text: 'x'.repeat(501) }, db)).status, 400);
     const teenCreated = await createPost(env, 'teen', { text: '練習', visibility: 'followers', eventTag: '100m' }, db);
     assert.equal(teenCreated.status, 201);
     const teenPostId = teenCreated.body.id as string;
