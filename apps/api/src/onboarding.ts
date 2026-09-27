@@ -1,25 +1,9 @@
 import { and, eq } from 'drizzle-orm';
 import { z } from 'zod';
+import { onboardingSchema } from '@track-social/contracts';
 import { authUser, featureFlags, profiles, userEvents, users } from '@track-social/db/schema';
 import { ageBand, ageOnDate, todayInJapan } from './age';
 import { createDatabase } from './db';
-
-const eventCodes = [
-  '100m', '200m', '400m', '800m', '1500m', '3000m', '5000m', '10000m',
-  'hurdles', 'steeplechase', 'relay', 'long_jump', 'high_jump', 'triple_jump',
-  'pole_vault', 'shot_put', 'discus', 'javelin', 'hammer', 'combined', 'race_walk',
-] as const;
-const reservedUsernames = new Set(['admin', 'support', 'help', 'official', 'moderator', 'system']);
-
-export const onboardingSchema = z.object({
-  birthDate: z.string(),
-  displayName: z.string().trim().min(1).max(40),
-  username: z.string().trim().toLowerCase().regex(/^[a-z0-9_]{3,20}$/)
-    .refine((name) => !reservedUsernames.has(name)),
-  eventCodes: z.array(z.enum(eventCodes)).min(1).max(10),
-  acceptTerms: z.literal(true),
-  acceptPrivacy: z.literal(true),
-});
 
 export async function completeOnboarding(env: Env, authUserId: string, input: unknown) {
   const parsed = onboardingSchema.safeParse(input);

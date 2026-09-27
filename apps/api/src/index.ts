@@ -1,5 +1,6 @@
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
+import type { RegistrationStatus } from '@track-social/contracts';
 import { createAuth } from './auth';
 import { completeOnboarding, getMyProfile, isRegistrationEnabled, updatePrivacy, usernameAvailable } from './onboarding';
 import { follow, pendingFollowRequests, resolveFollowRequest, setBlock, setMute, unfollow } from './social';
@@ -12,7 +13,8 @@ app.get('/v1/health', (context) => {
 });
 
 app.get('/v1/registration/status', async (context) => {
-  return context.json({ enabled: await isRegistrationEnabled(context.env) });
+  const status = { enabled: await isRegistrationEnabled(context.env) } satisfies RegistrationStatus;
+  return context.json(status);
 });
 
 app.all('/api/auth/*', async (context) => {

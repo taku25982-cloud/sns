@@ -3,6 +3,7 @@ import { Alert, Platform, Pressable, ScrollView, StyleSheet, Text, View } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { registrationStatusSchema } from '@track-social/contracts';
 import { Brand } from '../ui/Brand';
 import { theme } from '../ui/theme';
 import { apiBaseURL } from '../lib/auth-client';
@@ -15,7 +16,7 @@ export default function LoginScreen() {
       try {
         const response = await fetch(`${apiBaseURL}/v1/registration/status`);
         if (response.ok) {
-          const status = await response.json() as { enabled?: boolean };
+          const status = registrationStatusSchema.parse(await response.json());
           message = status.enabled
             ? '登録受付は有効ですが、Apple・Googleログインはまだ接続されていません。'
             : '現在、新規登録を受け付けていません。';
