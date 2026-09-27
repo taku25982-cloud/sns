@@ -65,8 +65,7 @@ export async function completeOnboarding(env: Env, authUserId: string, input: un
   return { status: 201 as const, body: { username: parsed.data.username, ageBand: band, isPrivate: age < 18 } };
 }
 
-export async function getMyProfile(env: Env, authUserId: string) {
-  const db = createDatabase(env);
+export async function getMyProfile(env: Env, authUserId: string, db = createDatabase(env)) {
   const rows = await db.select({
     id: users.id, status: users.status, birthDate: users.birthDate,
     username: profiles.username, displayName: profiles.displayName,

@@ -61,6 +61,15 @@ export const users = sqliteTable('users', {
   updatedAt: integer('updated_at', { mode: 'timestamp_ms' }).notNull(),
 });
 
+export const accountDeletionRequests = sqliteTable('account_deletion_requests', {
+  userId: text('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
+  previousStatus: text('previous_status').notNull(),
+  status: text('status').notNull(),
+  requestedAt: integer('requested_at', { mode: 'timestamp_ms' }).notNull(),
+  cancelUntil: integer('cancel_until', { mode: 'timestamp_ms' }).notNull(),
+  cancelledAt: integer('cancelled_at', { mode: 'timestamp_ms' }),
+});
+
 export const profiles = sqliteTable('profiles', {
   userId: text('user_id').primaryKey().references(() => users.id, { onDelete: 'cascade' }),
   username: text('username').notNull().unique(),
